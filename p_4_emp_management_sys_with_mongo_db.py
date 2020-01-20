@@ -5,7 +5,7 @@ from datetime import date
 
 # Create Database
 myclient = pymongo.MongoClient('mongodb://localhost:27017/')
-mydb = myclient['myDB']
+mydb = myclient['my_db']
 
 # Create Collection (Table)
 myCol = mydb["emp_details"]
@@ -17,41 +17,41 @@ myColFunctions = mydb['emp_functions']
 
 def addEmp(empId, empName, empAdd, empStatus, empDob, empEmail, empContact):
     empDob = str(empDob)
-    mydict = {'id':empId, 'empname': empName.capitalize(), 'empadd': empAdd.capitalize(), 'empstatus': empStatus.capitalize(), 'empdob': empDob, 'empemail': empEmail, 'empcontact': empContact ,'isdeleted':False}
+    mydict = {'id':empId, 'emp_name': empName.capitalize(), 'emp_add': empAdd.capitalize(), 'emp_status': empStatus.capitalize(), 'emp_dob': empDob, 'emp_email': empEmail, 'emp_contact': empContact ,'is_deleted':False}
     x = myCol.insert_one(mydict)
 
     if bool(x):
-        print("1 document inserted.")
+        print("1 document inserted.\n")
     else:
-        peint("0 document inserted.")
+        print("0 document inserted.\n")
 
 
 def showEmp():
     # for x in myCol.find({},{'_id':0,'id':1,'empname':1,'empadd':1,'empstatus':1,'empdob':1,'empemail':1,'empcontact':1}):
     for x in myCol.find({},{'_id':0}):           
-        if x['isdeleted'] == False:
+        if x['is_deleted'] == False:
             for i in x:
                 print(i.capitalize(), ':', x[i])
             print('\n')
     print('-'*30)
     
     for x in myCol.find({},{'_id':0}):
-        if x['isdeleted']:
+        if x['is_deleted']:
             print('Deleted Accounts')
             for i in x:
                 print(i.capitalize(), ':', x[i])
             print('\n')
-
+            print('-'*30)
 
 def deleteEmp(empEmail):
     i = None
-    for j in myCol.find({'empemail': empEmail.lower()},{'_id':0,'empemail':1,'isdeleted':1}):
+    for j in myCol.find({'emp_email': empEmail.lower()},{'_id':0,'emp_email':1,'is_deleted':1}):
         i=j
-        if i['isdeleted']:
+        if i['is_deleted']:
             print("Employee details already Deleted... :(\n")
         else:
-            oldValue = {'empemail':empEmail}
-            newValue = {'$set': {'isdeleted': True}}
+            oldValue = {'emp_email':empEmail}
+            newValue = {'$set': {'is_deleted': True}}
             x = myCol.update_one(oldValue, newValue)
             print(x.modified_count, " document deleted.\n")
     if i == None:
@@ -71,65 +71,72 @@ def deleteEmp(empEmail):
 
 
 def editempName(empName, empNewName):
-    myquery = {'empname': empName.capitalize()}
-    newvalue = {'$set':{'empname':empNewName.capitalize()} }
+    myquery = {'emp_name': empName.capitalize()}
+    newvalue = {'$set':{'emp_name':empNewName.capitalize()} }
     x = myCol.update_one(myquery, newvalue)
-    print(x.modified_count," document updated.")
+    print(x.modified_count," document updated.\n")
     print('-'*30)
 
 
 def editempAdd(empName, empNewAdd):
-    myquery = {'empname': empName.capitalize()}
-    newvalue = {'$set': {'empadd': empNewAdd} }
+    myquery = {'emp_name': empName.capitalize()}
+    newvalue = {'$set': {'emp_add': empNewAdd} }
     x = myCol.update_one(myquery, newvalue)
-    print(x.modified_count," document updated.")
+    print(x.modified_count," document updated.\n")
     print('-'*30)
 
 def editempStatus(empName, empNewStatus):
-    myquery = {'empname': empName.capitalize()}
-    newvalue = {'$set': {'empstatus': empNewStatus.capitalize()} }
+    myquery = {'emp_name': empName.capitalize()}
+    newvalue = {'$set': {'emp_status': empNewStatus.capitalize()} }
     x = myCol.update_one(myquery, newvalue)
     print(x.modified_count," document updated.")
     print('-'*30)
 
-    empId = myCol.find({'empname':empName.capitalize()},{'_id':0,'id':1})
+    empId = myCol.find({'emp_name':empName.capitalize()},{'_id':0,'id':1})
 
     for i in empId:
         colId = i['id']
 
-    myquery = myColSal.find({'empid':colId},{'_id':0,'empstatus':1})
+    myquery = myColSal.find({'emp_id':colId},{'_id':0,'emp_status':1})
 
     for i in myquery:
-        checkStatus = i['empstatus']
+        checkStatus = i['emp_status']
         print(checkStatus)
 
         if checkStatus == 'Fresher':
-            oldValue = {'empid': colId,'empstatus': "Fresher"}
-            newValue ={'$set': {'empstatus': empNewStatus.capitalize()}}
+            oldValue = {'emp_id': colId,'emp_status': "Fresher"}
+            newValue ={'$set': {'emp_status': empNewStatus.capitalize()}}
             myColSal.update_one(oldValue, newValue)
         else:
             print("Else")
 
 def editempDob(empName, empNewDob):
-    myquery = {'empname': empName.capitalize()}
+    myquery = {'emp_name': empName.capitalize()}
     empNewDob = str(empNewDob)
-    newvalue = {'$set': {'empdob': empNewDob}}
+    newvalue = {'$set': {'emp_dob': empNewDob}}
     x = myCol.update_one(myquery, newvalue)
-    print(x.modified_count," document updated.")
+    print(x.modified_count," document updated.\n")
     print('-'*30)
 
 def editempEmail(empName, empNewEmail):
-    myquery = {'empname': empName.capitalize()}
-    newvalue = {'$set': {'empemail': empNewEmail}}
+    myquery = {'emp_name': empName.capitalize()}
+    newvalue = {'$set': {'emp_email': empNewEmail}}
     x = myCol.update_one(myquery, newvalue)
-    print(x.modified_count," document updated.")
+    print(x.modified_count," document updated.\n")
+    print('-'*30)
+
+def editempContact(empName, empNewContact):
+    myquery = {'emp_name': empName.capitalize()}
+    newValue = {'$set': {'emp_contact': empNewContact}}
+    x = myCol.update_one(myquery, newValue)
+    print(x.modified_count," document updated.\n")
     print('-'*30)
 
 def addEmpSalary():
     salFresher = 7000
     salExperience = 20000
     # Calculate Salary for Fresher
-    myquery = {'empstatus': 'Fresher'}
+    myquery = {'emp_status': 'Fresher'}
     mydoc = myCol.find(myquery)
 
     for x in mydoc:
@@ -140,20 +147,20 @@ def addEmpSalary():
             i = j
 
         if i == None:
-            mydict = {'empid':x['id'],'empstatus':x['empstatus'], 'empsalary': salFresher}
+            mydict = {'emp_id':x['id'],'emp_status':x['emp_status'], 'emp_salary': salFresher}
             myColSal.insert_one(mydict)
             
         else:
             count = 0
 
             for i in myColSal.find():
-                if i["empid"] == x["id"]:
+                if i["emp_id"] == x["id"]:
                     count = count + 1
 
             if count == 0:
-                mydict = {'empid':x['id'],'empstatus':x['empstatus'], 'empsalary': salFresher}
+                mydict = {'emp_id':x['id'],'emp_status':x['emp_status'], 'emp_salary': salFresher}
                 myColSal.insert_one(mydict)
-                print("Document Inserted.")
+                print("Document Inserted.\n")
                   
             else:
                 print("Already present")
@@ -161,7 +168,7 @@ def addEmpSalary():
     # /End Calculate Salary for Fresher
 
     # Calculate Salary for Experience
-    myquery = {'empstatus': 'Experience'}
+    myquery = {'emp_status': 'Experience'}
     mydoc = myCol.find(myquery)
 
     for x in mydoc:
@@ -171,24 +178,24 @@ def addEmpSalary():
             i = j
 
         if i == None:
-            mydict = {'empid':x['id'],'empstatus':x['empstatus'], 'empsalary': salExperience}
+            mydict = {'emp_id':x['id'],'emp_status':x['emp_status'], 'emp_salary': salExperience}
             myColSal.insert_one(mydict)   
         else:
             count = 0
 
             for i in myColSal.find():
-                if i["empid"] == x["id"]:
+                if i["emp_id"] == x["id"]:
                     count = count + 1
 
             if count == 0:
-                mydict = {'empid':x['id'],'empstatus':x['empstatus'], 'empsalary': salExperience}
+                mydict = {'emp_id':x['id'],'emp_status':x['emp_status'], 'emp_salary': salExperience}
                 myColSal.insert_one(mydict)
             else:
                 print("Already present")
 
-            if j['empstatus'] == 'Experience':
-                oldValue = {'empstatus': 'Experience'}
-                newValue = {'$set': {'empsalary': salExperience}}
+            if j['emp_status'] == 'Experience':
+                oldValue = {'emp_status': 'Experience'}
+                newValue = {'$set': {'emp_salary': salExperience}}
                 myColSal.update_one(oldValue, newValue)    
     # /End Calculate Salary for Experience
     print('\n')
@@ -197,17 +204,17 @@ def addEmpSalary():
 def showEmpSal():
     
     for i in myCol.find():
-        if i['isdeleted'] == False:
-            for x in myColSal.find({'empid':i['id']},{'_id':0}):
+        if i['is_deleted'] == False:
+            for x in myColSal.find({'emp_id':i['id']},{'_id':0}):
 
                 for i in x:
                     print(i, ':', x[i])
                 print('\n')
     print('-'*30)
     for i in myCol.find():
-        if i['isdeleted']:
+        if i['is_deleted']:
             print('Deleted Employee Salary Details')
-            for x in myColSal.find({'empid':i['id']},{'_id':0}):
+            for x in myColSal.find({'emp_id':i['id']},{'_id':0}):
 
                 for i in x:
                     print(i, ':', x[i])
@@ -217,15 +224,29 @@ def showEmpSal():
 
 def holiday(holiDate, title):
     mydict = {'holiday':str(holiDate),'title':title.capitalize()}
-    myColHoliday.insert_one(mydict)
+    x = myColHoliday.insert_one(mydict)
+    if bool(x):
+        print("1 document inserted.\n")
+        print('-'*30)
+    else:
+        print("0 document inserted.\n")
+        print('-'*30)
 
 
 def showHoliday():
-    for x in myColHoliday.find({},{'_id':0}):
+    i = None
+    for j in myColHoliday.find({},{'_id':0}):
+        i = j
+    if i == None:
+        print("No Record found... :(\n")
+        print('-'*30)
+    else:
+        for x in myColHoliday.find({},{'_id':0}):
 
-        for i in x:
-            print(i.capitalize(), ':', x[i])
-        print("\n")
+            for i in x:
+                print(i.capitalize(), ':', x[i])
+            print("\n")
+        print('-'*30)
 
 
 def monthHoliday(monthNo):
@@ -242,7 +263,7 @@ def monthHoliday(monthNo):
 
 
 def addAttendance(empName,attDate,attendance):
-    empnm = myCol.find({'empname': empName.capitalize()},{'_id':0,'id':1})
+    empnm = myCol.find({'emp_name': empName.capitalize()},{'_id':0,'id':1})
 
     for x in empnm:
         i = None
@@ -251,8 +272,13 @@ def addAttendance(empName,attDate,attendance):
             i = j
 
         if i == None:
-            mydict = {'empid': x['id'], 'attendancedate': str(attDate), 'attendance': attendance}
-            myColAttendance.insert_one(mydict)
+            mydict = {'emp_id': x['id'], 'attendancedate': str(attDate), 'attendance': attendance}
+            x = myColAttendance.insert_one(mydict)
+
+            if bool(x) == True:
+                print("1 document inserted.")
+            else:
+                print("0 document inseted.")
         else:
             count = 0
             
@@ -262,58 +288,96 @@ def addAttendance(empName,attDate,attendance):
                     count = count + 1
             
             if count == 0:
-                mydict = {'empid': x['id'], 'attendancedate': str(attDate), 'attendance': attendance}
+                mydict = {'emp_id': x['id'], 'attendancedate': str(attDate), 'attendance': attendance}
                 x = myColAttendance.insert_one(mydict)
                 
                 if bool(x) == True:
-                    print("1 document inserted.")
+                    print("1 document inserted.\n")
                 else:
-                    print("0 document inseted.")
+                    print("0 document inseted.\n")
             else:
                 print("Already Present")
 
 
 def showAllAttendance():
-    for x in myCol.find({},{'_id':0}):
-        if x['isdeleted'] == False:
+    i = None
+    for x in myColAttendance.find({},{'_id':0}):
+        i = x
 
-            for i in myColAttendance.find({'empid':x['id']},{'_id':0}):
-                print('empname:',x['empname'],)
-                
-                for j in i:
-                    print(j,':',i[j])
-                print("\n")
-    print('-'*30)
-    for x in myCol.find({},{'_id':0}):
-        if x['isdeleted']:
-            print('Deleted Employee Attendance Details')
-            for i in myColAttendance.find({'empid':x['id']},{'_id':0}):
-                print('empname:',x['empname'],)
-                
-                for j in i:
-                    print(j,':',i[j])
-                print("\n")
+    if i == None:
+        print("No Record found... :(\n")
+        print('-'*30)
+    else:
+        for x in myCol.find({},{'_id':0}):
+            if x['is_deleted'] == False:
+
+                for i in myColAttendance.find({'emp_id':x['id']},{'_id':0}):
+                    print('emp_name:',x['emp_name'],)
+                    
+                    for j in i:
+                        print(j,':',i[j])
+                    print("\n")
+        print('-'*30)
+        for x in myCol.find({},{'_id':0}):
+            if x['is_deleted']:
+                i = None
+                for j in myColAttendance.find({'emp_id':x['id']},{'_id':0}):
+                    i = j
+
+                if i == None:
+                    pass
+                else:
+
+                    print('Deleted Employee Attendance Details')
+                    for i in myColAttendance.find({'emp_id':x['id']},{'_id':0}):
+                        print('emp_name:',x['emp_name'],)
+                        
+                        for j in i:
+                            print(j,':',i[j])
+                        print("\n")
+                    print('-'*30)
 
 def showAttendance(empName):
-    totalP = 0
-    totalA = 0
-    
-    for x in myCol.find({'empname': empName.capitalize()},{'_id':0}):
+    i = None
+    for x in myColAttendance.find({},{'_id':0}):
+        i = x
+    if i == None:
+        print("No Record found.. :(\n")
+        print('-'*30)
+    else:
+        totalP = 0
+        totalA = 0
         
-        for i in myColAttendance.find({'empid':x['id']},{'_id':0}):
-            print('empname:',x['empname'],)
-            
-            for j in i:
-                print(j,':',i[j])
-            print("\n")
+        for x in myCol.find({'emp_name': empName.capitalize()},{'_id':0}):
 
-            if i['attendance'] == 1:
-                totalP = totalP + 1
+            i = None
+            for j in myColAttendance.find({'emp_id':x['id']},{'_id':0}):
+                i = j
+
+            if i == None:
+                print("No Record found... :(\n")
+                print('-'*30)
+
             else:
-                totalA = totalA + 1
+                print('\n')
+                for i in myColAttendance.find({'emp_id':x['id']},{'_id':0}):
 
-    print("Total Present Attendance: ",totalP)
-    print("Total Absent Attendance: ",totalA)
+                    
+                    print('emp_name:',x['emp_name'],)
+                    
+                    for j in i:
+                        print(j,':',i[j])
+                    print("\n")
+
+                    if i['attendance'] == 1:
+                        totalP = totalP + 1
+                    else:
+                        totalA = totalA + 1
+
+                print("Total Present Attendance: ",totalP)
+                print("Total Absent Attendance: ",totalA)
+                print('\n')
+                print('-'*30)
 
 
 def functionData(functionDate, funcName):
@@ -342,26 +406,52 @@ def functionData(functionDate, funcName):
 
 
 def showFunctions():
-    for x in myColFunctions.find({},{'_id':0}):
+    i = None
+    for j in myColFunctions.find({},{'_id':0}):
+        i = j
 
-        for i in x:
-            print(i.capitalize(), ':', x[i])
-        print('\n')
+    if i == None:
+        print('No Record found... :(\n')
+        print('-'*30)
+    else:
+        for x in myColFunctions.find({},{'_id':0}):
+
+            for i in x:
+                print(i.capitalize(), ':', x[i])
+            print('\n')
 
 
 def checkEmail(empEmail):
     checkEmail = myCol.find({},{'_id':0})
     for i in checkEmail:
         
-        if i['empemail'] == empEmail:
+        if i['emp_email'] == empEmail:
             return 0
     return empEmail
     
 
-
 def checkEmailValidation(empEmail):
     result = re.findall(r"[-a-zA-Z0-9.`?{}]+@\w+\D\.\w*",empEmail)
     return result
+
+
+def checkContactLen(empContact):
+    if len(empContact) < 10 :
+        return 0
+    elif len(empContact) > 11:
+        return 0
+    else:
+        return empContact 
+
+def checkEmpName(empName):
+    i = None
+    for j in myCol.find({'emp_name': empName.capitalize()},{'_id':0}):
+        i = j
+    if i == None:
+        return 0
+    else:
+        return empName
+        
 
 # def checkId(empId):
 #     checkId = myCol.find({'id':empId},{'id_':0})
@@ -440,9 +530,24 @@ while True:
                 if empEmail:
                     empEmail = ''.join(empEmail)
                 else:
-                    print("Invalid Email Format... :(\n")
+                    print("Invalid Email Format.")
+                    print("Please try again... :(\n")
                     print('-'*30)
-                    break
+                    empEmail = input("Enter Employee email: ")
+                    empEmail = checkEmail(empEmail)
+                
+                    if empEmail == 0:
+                        print('Already Present')
+                        print('Please Try again... :(\n')
+                        print('-'*30)
+                    else:
+                        empEmail = checkEmailValidation(str(empEmail))
+                        if empEmail:
+                            empEmail = ''.join(empEmail)
+                        else:
+                            print("Invalid Email Format... :(\n")
+                            print('-'*30)
+                            break
 
         else:
             empEmail = checkEmailValidation(str(empEmail))
@@ -452,22 +557,60 @@ while True:
                 empEmail = checkEmail(empEmail)
 
             else:
-                print("Invalid Email Format... :(\n")
+                print("Invalid Email Format.")
+                print("Please try again... :(\n")
                 print('-'*30)
-                break
+                empEmail = input("Enter Employee email: ")
+                empEmail = checkEmail(empEmail)
+            
+                if empEmail == 0:
+                    print('Already Present')
+                    print('Please Try again... :(\n')
+                    print('-'*30)
+                else:
+                    empEmail = checkEmailValidation(str(empEmail))
+                    if empEmail:
+                        empEmail = ''.join(empEmail)
+                    else:
+                        print("Invalid Email Format... :(\n")
+                        print('-'*30)
+                        break
 
         # Try for Contact
         try:
             empContact = int(input("Enter Employee mobile no: "))
+            empContact = checkContactLen(str(empContact))
+            if empContact == 0:
+                print("Invalid length of contact, Please enter 10 digit contact number!!! :(\n")
+                print('-'*30)
+                empContact = int(input("Enter Employee mobile no: "))
+                empContact = checkContactLen(str(empContact))
+                if empContact == 0:
+                    print("Invalid length of contact, Please enter 10 digit contact number!!! :(\n")
+                    print('-'*30)
+                    break
+            
         # Except
         except ValueError:
             print("Invalid Mobile number, Please try again!!! :( \n")
             # Try
             try:
                 empContact = int(input("Enter Employee mobile no: "))
+                empContact = int(input("Enter Employee mobile no: "))
+                empContact = checkContactLen(str(empContact))
+                if empContact == 0:
+                    print("Invalid length of contact, Please enter 10 digit contact number!!! :(\n")
+                    print('-'*30)
+                    empContact = int(input("Enter Employee mobile no: "))
+                    empContact = checkContactLen(str(empContact))
+                    if empContact == 0:
+                        print("Invalid length of contact, Please enter 10 digit contact number!!! :(\n")
+                        print('-'*30)
+                        break
+                    
             # Except
             except ValueError:
-                print("invalid Mobile number, Please try againg!!! :( \n")
+                print("Invalid Mobile number, Please try againg!!! :( \n")
                 break
         # /end Try for Contact
         addEmp(empId, empName, empAdd, empStatus, empDob, empEmail, empContact)
@@ -489,14 +632,34 @@ while True:
         
         if ch == 1:
             empName = input("Enter employee name for update record: ")
+            empName = checkEmpName(empName)
+            if empName == 0:
+                print("Employee name not found, Please try again.. :(\n")
+                print('-'*30)
+                empName = input("Enter employee name for update record: ")
+                empName = checkEmpName(empName)
+                if empName == 0:
+                    print("Employee name not found, Please try again.. :(\n")
+                    print('-'*30)
+                    break
             empNewName = input("Enter employee new name: ")
-            editempName(empName, empNewName)
+            data = editempName(empName, empNewName)
         
         elif ch == 0:
             ch = int(input("Need to update employee addresss? "))
             
             if ch == 1:
                 empName = input("Enter employee name for update record: ")
+                empName = checkEmpName(empName)
+                if empName == 0:
+                    print("Employee name not found, Please try again.. :(\n")
+                    print('-'*30)
+                    empName = input("Enter employee name for update record: ")
+                    empName = checkEmpName(empName)
+                    if empName == 0:
+                        print("Employee name not found, Please try again.. :(\n")
+                        print('-'*30)
+                        break
                 empNewAdd = input("Enter employee new address: ")
                 editempAdd(empName, empNewAdd)
             
@@ -505,48 +668,164 @@ while True:
                 
                 if ch == 1:
                     empName = input("Enter employee name for update record: ")
-                    empNewStatus = input("Enter employee new status (Fresher or Experience): ")
-                    editempStatus(empName, empNewStatus)
+                    empName = checkEmpName(empName)
+                    if empName == 0:
+                        print("Employee name not found, Please try again.. :(\n")
+                        print('-'*30)
+                        empName = input("Enter employee name for update record: ")
+                        empName = checkEmpName(empName)
+                        if empName == 0:
+                            print("Employee name not found, Please try again.. :(\n")
+                            print('-'*30)
+                            break
+                        else:
+                            empNewStatus = input("Enter employee new status (Fresher or Experience): ")
+                            editempStatus(empName, empNewStatus)
+                    else:
+                        empNewStatus = input("Enter employee new status (Fresher or Experience): ")
+                        editempStatus(empName, empNewStatus)
                 elif ch == 0:
                     ch = int(input("Need to  update employee d.o.b.? "))
                     
                     if ch == 1:
                         empName = input("Enter employee name for update record: ")
+                        empName = checkEmpName(empName)
+                        if empName == 0:
+                            print("Employee name not found, Please try again.. :(\n")
+                            print('-'*30)
+                            empName = input("Enter employee name for update record: ")
+                            empName = checkEmpName(empName)
+                            if empName == 0:
+                                print("Employee name not found, Please try again.. :(\n")
+                                print('-'*30)
+                                break
                         dob = input("Enter employee dob (DD/mm/YYYY):")
                         empNewDob = datetime.strptime(dob, '%d/%m/%Y').date()
-                        editempDob(empName, empNewDob)
+
+                        # Try
+                        try:
+                            empNewDob = datetime.strptime(dob, '%d/%m/%Y').date() # date.fromisoformat(dates)
+                            editempDob(empName, empNewDob)
+                        # Exception
+                        except ValueError:
+                            print("Invalid Date, Please try again!!! :( \n")
+                            print('-'*30)
+                            dob = input("Enter employee dob (DD/mm/YYYY):")
+
+                            # Try
+                            try:
+                                empNewDob = datetime.strptime(dob, '%d/%m/%Y').date() # date.fromisoformat(dates)
+                                editempDob(empName, empNewDob)
+                            # Exception
+                            except ValueError:
+                                print("Invalid Date, Please try again!!! :( \n")
+                                break 
+                        # editempDob(empName, empNewDob)
                     
                     elif ch == 0:
                         ch = int(input("Need to update employee email? "))
                         
                         if ch == 1:
                             empName = input("Enter employee name for update record: ")
+                            empName = checkEmpName(empName)
+                            if empName == 0:
+                                print("Employee name not found, Please try again.. :(\n")
+                                print('-'*30)
+                                empName = input("Enter employee name for update record: ")
+                                empName = checkEmpName(empName)
+                                if empName == 0:
+                                    print("Employee name not found, Please try again.. :(\n")
+                                    print('-'*30)
+                                    break
                             empNewEmail = input("Enter employee new email: ")
-                            editempEmail(empName, empNewEmail)
+                            empNewEmail = checkEmail(empNewEmail)
+                
+                            if empNewEmail == 0:
+                                print('Already Present')
+                                print('Please Try again... :(\n')
+                                print('-'*30)
+                                empNewEmail = input("Enter employee new email: ")
+                                empNewEmail = checkEmail(empNewEmail)
+                    
+                                if empNewEmail == 0:
+                                    print('Already Present')
+                                    print('Please Try again... :(\n')
+                                    print('-'*30)
+                                else:
+                                    empNewEmail = checkEmailValidation(str(empNewEmail))
+                                    if empNewEmail:
+                                        empNewEmail = ''.join(empNewEmail)
+                                        editempEmail(empName, empNewEmail)
+                                    else:
+                                        print("Invalid Email Format... :(\n")
+                                        print('-'*30)
+                                        break
+                            else:
+                                empNewEmail = checkEmailValidation(str(empNewEmail))
+                                if empNewEmail:
+                                    empNewEmail = ''.join(empNewEmail)
+                                    editempEmail(empName, empNewEmail)
+                                else:
+                                    print("Invalid Email Format... :(\n")
+                                    print('-'*30)
+                                    break
+                            # editempEmail(empName, empNewEmail)
                         elif ch == 0:
-                            pass
-                            print("\n")
-                            print('-'*30)
+                            ch = int(input("Need to update employee contact? "))
+                            if ch == 1:
+                                empName = input("Enter employee name for update record: ")
+                                empName = checkEmpName(empName)
+                                if empName == 0:
+                                    print("Employee name not found, Please try again.. :(\n")
+                                    print('-'*30)
+                                try:
+                                    empNewContact = int(input("Enter Employee mobile no: "))
+                                    empNewContact = checkContactLen(str(empNewContact))
+                                    if empNewContact == 0:
+                                        print("Invalid length of contact, Please enter 10 digit contact number!!! :(\n")
+                                        print('-'*30)
+                                        empNewContact = int(input("Enter Employee mobile no: "))
+                                        empNewContact = checkContactLen(str(empNewContact))
+                                        if empNewContact == 0:
+                                            print("Invalid length of contact, Please enter 10 digit contact number!!! :(\n")
+                                            print('-'*30)
+                                            break
+                                        else:
+                                            editempContact(empName, empNewContact)
+                                    else:
+                                        editempContact(empName, empNewContact)
+                                # Except
+                                except ValueError:
+                                    print("Invalid Mobile number, Please try again!!! :( \n")
+                            else:
+                                print("\n")
+                                print('-'*30)
+                                pass
                         else:
-                            print("Invalid Input... :(")
+                            print("Invalid Input... :(\n")
+                            print('-'*30)
         
                     else:
-                        print("Invalid Input... :(")
+                        print("Invalid Input... :(\n")
+                        print('-'*30)
                     
                 else:
-                    print("Invalid Input... :(")
+                    print("Invalid Input... :(\n")
+                    print('-'*30)
         
             else:
-                print("Invalid Input... :(")
+                print("Invalid Input... :(\n")
+                print('-'*30)
         
         else:
-            print("Invalid Input... :(")
+            print("Invalid Input... :(\n")
+            print('-'*30)
     # /End Update Employee Details
 
     # Display All Employees
     elif ch == 4:
         showEmp()
-        print('-'*30)
+        
     # /End Display All Employees
 
     # Salary Management
@@ -575,83 +854,214 @@ while True:
         
         if ch == 1:
             empName = input("Enter employee name for add attendance: ")
-            print("1. Auto select Today Date: ")
-            print("2. Enter Manual Date: ")
-            ch = int(input("Enter your choice: "))
-            print('-'*30)
+            empName = checkEmpName(empName)
+            if empName == 0:
+                print("Employee name not found, Please try again.. :(\n")
+                print('-'*30)
+                empName = input("Enter employee name for add attendance: ")
+                empName = checkEmpName(empName)
+                if empName == 0:
+                    print("Employee name not found, Please try again.. :(\n")
+                    print('-'*30)
+                else:
+                    print("1. Auto select Today Date: ")
+                    print("2. Enter Manual Date: ")
+                    ch = int(input("Enter your choice: "))
+                    print('-'*30)
 
-            if ch == 1:
-                attDate = datetime.now().date()
-                attendance = int(input("Enter attendance 0-Absent or 1-Present: "))
-                attendance = abs(attendance)
-        
-                if attendance < 2:
-                    addAttendance(empName,attDate,attendance)
-                else:
-                    print("Invalaid Input... :(")
-        
-            elif ch == 2:
-                date = input("Enter a previous date(DD/mm/YYYY): ")
-                attDate = datetime.strptime(date, '%d/%m/%Y').date()
-                curDate = datetime.now().date()
-        
-                if curDate < attDate :
-                    print("You are insert future's date...!")
-                    print("Please try again...!")
-                else:
+                    if ch == 1:
+                        attDate = datetime.now().date()
+                        attendance = int(input("Enter attendance 0-Absent or 1-Present: "))
+                        attendance = abs(attendance)
+                
+                        if attendance < 2:
+                            addAttendance(empName,attDate,attendance)
+                        else:
+                            print("Invalaid Input... :(\n")
+            else:
+                print("1. Auto select Today Date: ")
+                print("2. Enter Manual Date: ")
+                ch = int(input("Enter your choice: "))
+                print('-'*30)
+
+                if ch == 1:
+                    attDate = datetime.now().date()
                     attendance = int(input("Enter attendance 0-Absent or 1-Present: "))
                     attendance = abs(attendance)
-        
+            
                     if attendance < 2:
                         addAttendance(empName,attDate,attendance)
                     else:
-                        print("Invalaid Input... :(")
+                        print("Invalaid Input... :(\n")
         
-            else:
-                print("Invalid Input... :(")
-            print('\n')
-            print('-'*30)
+                elif ch == 2:
+                    date = input("Enter a previous date(DD/mm/YYYY): ")
+                    # Try
+                    try:
+                        attDate = datetime.strptime(date, '%d/%m/%Y').date()
+                        curDate = datetime.now().date()
+                
+                        if curDate < attDate :
+                            print("You are insert future's date...! Please try again... :(\n")
+                            print('-'*30)
+
+                            date = input("Enter a previous date(DD/mm/YYYY): ")
+                            # Try
+                            try:
+                                attDate = datetime.strptime(date, '%d/%m/%Y').date()
+                                curDate = datetime.now().date()
+                        
+                                if curDate < attDate :
+                                    print("You are insert future's date...! Please try again... :(\n")
+                                    print('-'*30)
+                                    break
+                                else:
+                                    attendance = int(input("Enter attendance 0-Absent or 1-Present: "))
+                                    attendance = abs(attendance)
+                        
+                                    if attendance < 2:
+                                        addAttendance(empName,attDate,attendance)
+                                    else:
+                                        print("Invalaid Input... :(\n")
+                                        print('-'*30)
+                            # Exception
+                            except ValueError:
+                                print("Invalid Date, Please try again!!! :( \n")
+                                print('-'*30)
+
+                        else:
+                            attendance = int(input("Enter attendance 0-Absent or 1-Present: "))
+                            attendance = abs(attendance)
+                
+                            if attendance < 2:
+                                addAttendance(empName,attDate,attendance)
+                            else:
+                                print("Invalaid Input... :(\n")
+                                print('-'*30)
+                    # Exception
+                    except ValueError:
+                        print("Invalid Date, Please try again!!! :( \n")
+                        print('-'*30)
+                        date = input("Enter a previous date(DD/mm/YYYY): ")
+                        # Try
+                        try:
+                            attDate = datetime.strptime(date, '%d/%m/%Y').date()
+                            curDate = datetime.now().date()
+                            if curDate < attDate :
+                                print("You are insert future's date...! Please try again... :(\n")
+                                print('-'*30)
+                                break
+                            else:
+                                attendance = int(input("Enter attendance 0-Absent or 1-Present: "))
+                                attendance = abs(attendance)
+                    
+                                if attendance < 2:
+                                    addAttendance(empName,attDate,attendance)
+                                else:
+                                    print("Invalaid Input... :(\n")
+                                    print('-'*30)
+                        # Exception
+                        except ValueError:
+                            print("Invalid Date, Please try again!!! :( \n")
+                            print('-'*30)
+                            break
+        
+                else:
+                    print("Invalid Input... :(")
+                print('\n')
+                print('-'*30)
         
         elif ch == 2:
             showAllAttendance()
-            print('-'*30)
+
         elif ch == 3:
             empName = input("Enter employee name: ")
-            showAttendance(empName)
-            print('-'*30)
+            empName = checkEmpName(empName)
+            if empName == 0:
+                print("Employee name not found, Please try again.. :(\n")
+                print('-'*30)
+                empName = input("Enter employee name: ")
+                empName = checkEmpName(empName)
+                if empName == 0:
+                    print("Employee name not found, Please try again.. :(\n")
+                    print('-'*30)
+                    break
+                else:
+                    showAttendance(empName)
+            else:
+                showAttendance(empName)
+            
         else:
-            print("Invalid Input... :(")
+            print("Invalid Input... :(\n")
+            print('-'*30)
     # /End Attendance Management
 
     # Function Management
     elif ch == 7:
-        print("1. Add Function Name (date)")
+        print("1. Add Function Date and Name")
         print("2. List of all Function")
         ch = int(input("Enter your choice: "))
         print('-'*30)
         
         if ch == 1:
             date = input("Enter date (DD/mm/YYYY): ")
-            functionDate = datetime.strptime(date,"%d/%m/%Y").date()
-            funcName = input("Enter name of Function: ")
+            
+            # Try
+            try:
+                functionDate = datetime.strptime(date,"%d/%m/%Y").date() # date.fromisoformat(dates)
+                # funcName = input("Enter name of Function: ")
 
-            curDate = datetime.now().date()
-            curYear = curDate.strftime("%Y")
-            functionYear = functionDate.strftime("%Y")
+                curDate = datetime.now().date()
+                curYear = curDate.strftime("%Y")
+                functionYear = functionDate.strftime("%Y")
 
-            if functionYear == curYear:
-                if functionDate < curDate:
-                    print('You are input Past Date. You does not set Function in Past.')
-                    print('Please try again!!! :(\n')
-                else:    
-                    functionData(functionDate, funcName)
-            else:
-                print("\nPlease insert present year... :(")
-            print('-'*30)
+                if functionYear == curYear:
+                    if functionDate < curDate:
+                        print('You are input Past Date. You does not set Function in Past.')
+                        print('Please try again!!! :(\n')
+                        print('-'*30)
+                    else:    
+                        funcName = input("Enter name of Function: ")
+                        functionData(functionDate, funcName)
+                else:
+                    print("\nPlease insert present year... :(")
+                print('-'*30)
+            # Exception
+            except ValueError:
+                print("Invalid Date, Please try again!!! :( \n")
+                print('-'*30)
+                date = input("Enter date (DD/mm/YYYY): ")
+            
+                # Try
+                try:
+                    functionDate = datetime.strptime(date,"%d/%m/%Y").date() # date.fromisoformat(dates)
+                    # funcName = input("Enter name of Function: ")
+
+                    curDate = datetime.now().date()
+                    curYear = curDate.strftime("%Y")
+                    functionYear = functionDate.strftime("%Y")
+
+                    if functionYear == curYear:
+                        if functionDate < curDate:
+                            print('You are input Past Date. You does not set Function in Past.')
+                            print('Please try again!!! :(\n')
+                            prnt('-'*30)
+                        else:
+                            funcName = input("Enter name of Function: ") 
+                            functionData(functionDate, funcName)
+                    else:
+                        print("\nPlease insert present year... :(")
+                    print('-'*30)
+                # Exception
+                except ValueError:
+                    print("Invalid Date, Please try again!!! :( \n")
+                    break 
+
+            
 
         elif ch == 2:
             showFunctions()
-            print('-'*30)
+            
         else:
             print("Invalid Input... :(")
     # /End Fnction Management
@@ -666,19 +1076,73 @@ while True:
         
         if ch == 1 :
             date = input("Enter date (DD/mm/YYYY): ")
-            holiDate = datetime.strptime(date,"%d/%m/%Y").date()
-            title = input("Enter title of holiday: ")
 
-            curDate = datetime.now().date()
-            curYear = curDate.strftime("%Y")
-            holiYear = holiDate.strftime("%Y")
+            # Try
+            try:
+                holiDate = datetime.strptime(date,"%d/%m/%Y").date() # date.fromisoformat(dates)
+                
+                curDate = datetime.now().date()
+                curYear = curDate.strftime("%Y")
+                holiYear = holiDate.strftime("%Y")
+                
+                if holiYear == curYear:
+                    # print("\nPresent Year")
+                    title = input("Enter title of holiday: ")
+                    holiday(holiDate, title)
+                else:
+                    print("\nPlease insert present year... :(\n")
+                    print('-'*30)
+                    date = input("Enter date (DD/mm/YYYY): ")
+
+                    # Try
+                    try:
+                        holiDate = datetime.strptime(date,"%d/%m/%Y").date() # date.fromisoformat(dates)
+                        
+
+                        curDate = datetime.now().date()
+                        curYear = curDate.strftime("%Y")
+                        holiYear = holiDate.strftime("%Y")
+                        
+                        if holiYear == curYear:
+                            # print("\nPresent Year")
+                            title = input("Enter title of holiday: ")
+                            holiday(holiDate, title)
+                        else:
+                            print("\nPlease insert present year... :(\n")
+                            print('-'*30)
+                    # Exception
+                    except ValueError:
+                        print("Invalid Date, Please try again!!! :( \n")
+                        print('-'*30)
+                        break
+            # Exception
+            except ValueError:
+                print("Invalid Date, Please try again!!! :( \n")
+                print('-'*30)
+                date = input("Enter date (DD/mm/YYYY): ")
+
+                # Try
+                try:
+                    holiDate = datetime.strptime(date,"%d/%m/%Y").date() # date.fromisoformat(dates)
+                    
+
+                    curDate = datetime.now().date()
+                    curYear = curDate.strftime("%Y")
+                    holiYear = holiDate.strftime("%Y")
+                    
+                    if holiYear == curYear:
+                        # print("\nPresent Year")
+                        title = input("Enter title of holiday: ")
+                        holiday(holiDate, title)
+                    else:
+                        print("\nPlease insert present year... :(\n")
+                        print('-'*30)
+                # Exception
+                except ValueError:
+                    print("Invalid Date, Please try again!!! :( \n")
+                    print('-'*30)
+                    break
             
-            if holiYear == curYear:
-                print("\nPresent Year")
-                holiday(holiDate, title)
-            else:
-                print("\nPlease insert present year... :(")
-            print('-'*30)
 
         elif ch == 2:
             monthNo = int(input("Enter month number: "))
@@ -691,7 +1155,7 @@ while True:
 
         elif ch == 3:
             showHoliday()
-            print('-'*30)
+            
         else:
             print("Invalid Input... :(")
     # /End Holiday Management
